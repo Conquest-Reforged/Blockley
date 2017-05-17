@@ -1,0 +1,108 @@
+<html>
+<head>
+    <link rel="stylesheet" href="">
+    <script>
+    function filter() {
+        var input = document.getElementById("search");
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById("blocks");
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 0; i < tr.length; i++) {
+            var td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+                if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+    </script>
+    <style>
+    body {
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        color: #505050;
+    }
+    .title-bar {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        background-color: #ffffff;
+        box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.25);
+    }
+    .search-wrapper {
+        position: relative;
+        width: 90%;
+        margin: auto auto;
+    }
+    .search {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0 5px 0;
+        border: none;
+        font-size: medium;
+        color: #505050;
+        box-shadow: 0 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+    }
+    .content {
+        width: 90%;
+        margin: 60px auto 60px auto;
+    }
+    a.anchor {
+        display: block;
+        position: relative;
+        top: -90px;
+        visibility: hidden;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    tr:nth-child(odd) {
+        background-color: #fafafa;
+    }
+    tr:hover {
+        box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1) inset;
+    }
+    th {
+        text-align: left;
+        padding: 10px;
+        white-space: nowrap;
+        background-color: #F44336;
+        color: #ffffff;
+    }
+    td {
+        padding: 10px;
+    }
+    </style>
+</head>
+<body>
+<div class="title-bar">
+    <div class="search-wrapper">
+        <input id="search" class="search" type="text" onkeyup="filter()" placeholder="Search for blocks...">
+    </div>
+</div>
+<div class="content">
+    <table id="blocks">
+        <thead>
+            <tr>
+                <th style="width:48px;">Icon</th>
+                <th style="width:100%">Name</th>
+            </tr>
+        </thead>
+        <tbody>{{#content}}
+            <tr onclick="window.document.location='#{{name}}'">
+                <td><img src="./images/{{identifier}}.png"></td>
+                <td style="width: 100%">{{name}} ({{id}}:{{meta}})
+                    <a class="anchor" id="{{name}}"></a>
+                </td>
+            </tr>{{/content}}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

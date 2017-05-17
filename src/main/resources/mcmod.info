@@ -1,0 +1,16 @@
+[
+{
+  "modid": "blocklist",
+  "name": "BlockList",
+  "description": "Block ID list",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["dags"],
+  "credits": "dags",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
