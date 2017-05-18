@@ -40,6 +40,6 @@ public class StreamSource implements CharSource {
 
     @Override
     public void close() throws IOException {
-       // reader.close();
+        reader.close();
     }
 }
