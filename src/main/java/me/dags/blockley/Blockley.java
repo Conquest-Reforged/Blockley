@@ -69,7 +69,6 @@ public class Blockley {
     @SubscribeEvent
     public void tick(TickEvent.RenderTickEvent event) {
         if (show.isPressed()) {
-            ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || !index.exists()) {
                 createIndex(this::show);
             } else {
