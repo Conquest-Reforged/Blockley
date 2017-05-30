@@ -37,16 +37,16 @@ public class Template implements Element {
             Map map = (Map) context;
             for (Element e : elements) {
                 Object o = map.get(e.getName());
-                appendable.append(e.render(o));
+                e.render(o, appendable);
             }
         } else if (context instanceof List) {
             List list = (List) context;
             for (Object o : list) {
-                appendable.append(render(o));
+                render(o, appendable);
             }
         } else {
             for (Element e : elements) {
-                appendable.append(e.render(context));
+                e.render(context, appendable);
             }
         }
     }
