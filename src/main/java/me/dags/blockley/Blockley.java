@@ -14,6 +14,7 @@ import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -38,7 +39,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-@Mod(modid = "blockley", name = "Blockley", version = "1.0.1", clientSideOnly = true)
+@Mod(modid = "blockley", name = "Blockley", version = "1.0.2", clientSideOnly = true)
 public class Blockley {
 
     private static final KeyBinding show = new KeyBinding("blockley.show", Keyboard.KEY_B, "Blockley");
@@ -66,6 +67,7 @@ public class Blockley {
     public void tick(TickEvent.RenderTickEvent event) {
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || !index.exists()) {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block index..."));
                 createIndex(this::show);
             } else {
                 show();
@@ -176,7 +178,7 @@ public class Blockley {
         RenderHelper.enableStandardItemLighting();
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(0, 0, 100);
+        GlStateManager.translate(0, 0, 250);
         GlStateManager.scale(scaleW, scaleH, 1F);
         GlStateManager.alphaFunc(GL11.GL_NOTEQUAL, 0);
 
