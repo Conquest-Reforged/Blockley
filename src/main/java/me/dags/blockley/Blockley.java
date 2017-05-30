@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-@Mod(modid = "blockley", name = "Blockley", version = "1.0", clientSideOnly = true)
+@Mod(modid = "blockley", name = "Blockley", version = "1.0.1", clientSideOnly = true)
 public class Blockley {
 
     private static final KeyBinding show = new KeyBinding("blockley.show", Keyboard.KEY_B, "Blockley");
