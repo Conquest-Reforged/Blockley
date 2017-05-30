@@ -38,12 +38,8 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-@Mod(modid = Blockley.ID, name = Blockley.NAME, version = Blockley.VERSION)
+@Mod(modid = "blockley", name = "Blockley", version = "1.0", clientSideOnly = true)
 public class Blockley {
-
-    public static final String ID = "blockley";
-    public static final String NAME = "Blockley";
-    public static final String VERSION = "1.0";
 
     private static final KeyBinding show = new KeyBinding("blockley.show", Keyboard.KEY_B, "Blockley");
 
@@ -68,8 +64,7 @@ public class Blockley {
 
     @SubscribeEvent
     public void tick(TickEvent.RenderTickEvent event) {
-        if (show.isPressed()) {
-            ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
+        if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || !index.exists()) {
                 createIndex(this::show);
             } else {
@@ -153,10 +148,12 @@ public class Blockley {
         Context context = Context.root().list("content");
         for (ItemStack stack : list) {
             Block block = Block.getBlockFromItem(stack.getItem());
+
             String name = stack.getDisplayName();
             String identifier = stack.getUnlocalizedName();
             int id = Block.getIdFromBlock(block);
             int meta = stack.getMetadata();
+
             context.map(identifier)
                     .put("name", name)
                     .put("identifier", identifier)
@@ -188,7 +185,7 @@ public class Blockley {
         GlStateManager.popMatrix();
         RenderHelper.disableStandardItemLighting();
 
-        BufferedImage image = createImage(width, height, framebuffer);
+        BufferedImage image = createImage(width, height);
         framebuffer.unbindFramebuffer();
         framebuffer.deleteFramebuffer();
 
@@ -196,7 +193,7 @@ public class Blockley {
     }
 
     // from render helper
-    private static BufferedImage createImage(int width, int height, Framebuffer framebufferIn) {
+    private static BufferedImage createImage(int width, int height) {
         int i = width * height;
 
         if (pixelBuffer == null || pixelBuffer.capacity() < i) {
