@@ -80,7 +80,7 @@ public class Blockley {
             task.set(EMPTY);
             runnable.run();
             return;
-        } 
+        }
 
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || !index.exists()) {

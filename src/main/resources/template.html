@@ -93,17 +93,15 @@
             <th style="width:48px;">Icon</th>
             <th style="width:100%">Name</th>
             <th style="width:auto">ID</th>
-            <th style="width:100%">State</th>
+            <th style="width:auto">State</th>
         </tr>
         </thead>
         <tbody>{{#content}}
         <tr onclick="window.document.location='#{{name}}'">
             <td><img src="./images/{{identifier}}.png"></td>
-            <td style="width: 100%">{{name}}
-                <a class="anchor" id="{{state}}"></a>
-            </td>
+            <td style="width: 100%">{{name}}</td>
             <td>{{id}}:{{meta}}</td>
-            <td>{{state}}</td>
+            <td>{{state}}<a class="anchor" id="{{state}}"></a></td>
         </tr>{{/content}}
         </tbody>
     </table>
