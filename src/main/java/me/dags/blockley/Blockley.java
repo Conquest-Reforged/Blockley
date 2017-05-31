@@ -1,9 +1,12 @@
 package me.dags.blockley;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import me.dags.blockley.template.Context;
 import me.dags.blockley.template.Template;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -35,23 +38,29 @@ import java.io.InputStream;
 import java.nio.IntBuffer;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author dags <dags@dags.me>
  */
-@Mod(modid = "blockley", name = "Blockley", version = "1.0.2", clientSideOnly = true)
+@Mod(modid = "blockley", name = "Blockley", version = "1.0.3", clientSideOnly = true)
 public class Blockley {
 
     private static final KeyBinding show = new KeyBinding("blockley.show", Keyboard.KEY_B, "Blockley");
 
     private static final int WIDTH = 64;
     private static final int HEIGHT = 64;
+    private static final Runnable EMPTY = () -> {};
+    private static final Set<String> propertyFilter = Sets.newHashSet(
+            "age", "color", "eye", "half", "layers", "mode", "snowy", "type", "variant", "wet"
+    );
 
     private static IntBuffer pixelBuffer;
     private static int[] pixelValues;
 
     private File index = new File("");
     private File images = new File("");
+    private final AtomicReference<Runnable> task = new AtomicReference<>(EMPTY);
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
@@ -65,12 +74,20 @@ public class Blockley {
 
     @SubscribeEvent
     public void tick(TickEvent.RenderTickEvent event) {
+        Runnable runnable = task.get();
+
+        if (runnable != EMPTY) {
+            task.set(EMPTY);
+            runnable.run();
+            return;
+        } 
+
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || !index.exists()) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block index..."));
-                createIndex(this::show);
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block list..."));
+                task.set(this::createIndex);
             } else {
-                show();
+                task.set(this::show);
             }
         }
     }
@@ -85,8 +102,8 @@ public class Blockley {
         }
     }
 
-    private void createIndex(Runnable callback) {
-        List<ItemStack> items = getAllItems();
+    private void createIndex() {
+        List<BlockInfo> items = getAllItems();
 
         try (FileWriter writer = new FileWriter(ensure(index))) {
             try (InputStream inputStream = Blockley.class.getResourceAsStream("/template.html")) {
@@ -110,12 +127,13 @@ public class Blockley {
                     e.printStackTrace();
                 }
             }
-            callback.run();
+
+            task.set(this::show);
         }).start();
     }
 
-    private static List<ItemStack> getAllItems() {
-        List<ItemStack> list = new LinkedList<>();
+    private static List<BlockInfo> getAllItems() {
+        List<BlockInfo> list = new LinkedList<>();
         Set<String> visited = new HashSet<>();
 
         for (Block block : Block.REGISTRY) {
@@ -127,8 +145,10 @@ public class Blockley {
             List<ItemStack> items = new LinkedList<>();
             block.getSubBlocks(item, CreativeTabs.SEARCH, items);
             for (ItemStack stack : items) {
-                if (visited.add(stack.getUnlocalizedName())) {
-                    list.add(stack);
+                IBlockState state = block.getStateFromMeta(stack.getMetadata());
+                BlockInfo info = new BlockInfo(stack, state);
+                if (visited.add(info.identifier)) {
+                    list.add(info);
                 }
             }
         }
@@ -136,31 +156,25 @@ public class Blockley {
         return list;
     }
 
-    private static ImmutableMap<String, BufferedImage> getIcons(List<ItemStack> list) {
+    private static ImmutableMap<String, BufferedImage> getIcons(List<BlockInfo> list) {
         ImmutableMap.Builder<String, BufferedImage> builder = ImmutableMap.builder();
         ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
-        for (ItemStack stack : list) {
-            BufferedImage image = createImage(stack, resolution);
-            builder.put(stack.getUnlocalizedName(), image);
+        for (BlockInfo info : list) {
+            BufferedImage image = createImage(info.stack, resolution);
+            builder.put(info.identifier, image);
         }
         return builder.build();
     }
 
-    private static Context getContext(List<ItemStack> list) {
+    private static Context getContext(List<BlockInfo> list) {
         Context context = Context.root().list("content");
-        for (ItemStack stack : list) {
-            Block block = Block.getBlockFromItem(stack.getItem());
-
-            String name = stack.getDisplayName();
-            String identifier = stack.getUnlocalizedName();
-            int id = Block.getIdFromBlock(block);
-            int meta = stack.getMetadata();
-
-            context.map(identifier)
-                    .put("name", name)
-                    .put("identifier", identifier)
-                    .put("id", id)
-                    .put("meta", meta);
+        for (BlockInfo info : list) {
+            context.map(info.identifier)
+                    .put("name", info.name)
+                    .put("identifier", info.identifier)
+                    .put("state", info.state)
+                    .put("id", info.id)
+                    .put("meta", info.meta);
         }
         return context.getRoot();
     }
@@ -182,7 +196,7 @@ public class Blockley {
         GlStateManager.scale(scaleW, scaleH, 1F);
         GlStateManager.alphaFunc(GL11.GL_NOTEQUAL, 0);
 
-        Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, 0,0);
+        Minecraft.getMinecraft().getRenderItem().renderItemIntoGUI(stack, 0, 0);
 
         GlStateManager.popMatrix();
         RenderHelper.disableStandardItemLighting();
@@ -225,5 +239,51 @@ public class Blockley {
     private static File ensure(File file) {
         file.getParentFile().mkdirs();
         return file;
+    }
+
+    private static class BlockInfo {
+
+        private final ItemStack stack;
+        private final String name;
+        private final String state;
+        private final String identifier;
+        private final int id;
+        private final int meta;
+
+        private BlockInfo(ItemStack stack, IBlockState state) {
+            this.stack = stack;
+            this.name = stack.getDisplayName();
+            this.state = simpleState(state);
+            this.identifier = safeId(this.state);
+            this.id = Block.getIdFromBlock(state.getBlock());
+            this.meta = state.getBlock().getMetaFromState(state);
+        }
+
+        private static String simpleState(IBlockState state) {
+            StringBuilder sb = new StringBuilder(state.toString().length());
+            sb.append(state.getBlock().getRegistryName());
+
+            boolean extended = false;
+
+            for (Map.Entry<IProperty<?>, ?> property : state.getProperties().entrySet()) {
+                String name = property.getKey().getName();
+                if (propertyFilter.contains(name)) {
+                    sb.append(extended ? ',' : '[');
+                    sb.append(name).append('=').append(property.getValue());
+                    extended = true;
+                }
+            }
+
+            if (extended) {
+                sb.append(']');
+            }
+
+            return sb.toString();
+        }
+
+        private static String safeId(Object in) {
+            String id = in.toString().replaceAll("[^A-Za-z0-9=]", "_");
+            return id.endsWith("_") ? id.substring(0, id.length() - 1) : id;
+        }
     }
 }

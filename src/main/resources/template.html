@@ -72,7 +72,7 @@
         text-align: left;
         padding: 10px;
         white-space: nowrap;
-        background-color: #F44336;
+        background-color: #f44336;
         color: #ffffff;
     }
     td {
@@ -89,18 +89,22 @@
 <div class="content">
     <table id="blocks">
         <thead>
-            <tr>
-                <th style="width:48px;">Icon</th>
-                <th style="width:100%">Name</th>
-            </tr>
+        <tr>
+            <th style="width:48px;">Icon</th>
+            <th style="width:100%">Name</th>
+            <th style="width:auto">ID</th>
+            <th style="width:100%">State</th>
+        </tr>
         </thead>
         <tbody>{{#content}}
-            <tr onclick="window.document.location='#{{name}}'" title="{{identifier}}">
-                <td><img src="./images/{{identifier}}.png"></td>
-                <td style="width: 100%">{{name}} ({{id}}:{{meta}})
-                    <a class="anchor" id="{{name}}"></a>
-                </td>
-            </tr>{{/content}}
+        <tr onclick="window.document.location='#{{name}}'">
+            <td><img src="./images/{{identifier}}.png"></td>
+            <td style="width: 100%">{{name}}
+                <a class="anchor" id="{{name}}"></a>
+            </td>
+            <td>{{id}}:{{meta}}</td>
+            <td>{{state}}</td>
+        </tr>{{/content}}
         </tbody>
     </table>
 </div>
