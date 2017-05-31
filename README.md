@@ -4,7 +4,7 @@ A Minecraft block list generator
 ![](https://github.com/dags-/Blockley/blob/master/Screenshot%202017-05-31%2011.03.35.jpg)
 
 ## Get It
-[Latest Release](https://github.com/dags-/Blockley/releases/latest)
+[![Latest](http://github-release-version.herokuapp.com/github/dags-/Blockley/release.svg?style=flat)](https://github.com/dags-/Blockley/releases/latest)
 
 ## Controls
 - Press `'B'` while in-game to open the block list.
