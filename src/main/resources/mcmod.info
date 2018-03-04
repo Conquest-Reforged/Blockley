@@ -3,7 +3,7 @@
   "modid": "blocklist",
   "name": "BlockList",
   "description": "Block ID list",
-  "version": "1.0",
+  "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
