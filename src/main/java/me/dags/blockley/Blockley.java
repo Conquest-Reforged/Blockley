@@ -6,10 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -55,7 +53,7 @@ public class Blockley {
 
         if (task != ExportTask.EMPTY) {
             if (task.isDone()) {
-                Minecraft.getMinecraft().player.sendMessage(new TextComponentString("Export complete!"));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Export complete!"));
                 exportTask.set(ExportTask.EMPTY);
                 return;
             }
@@ -66,7 +64,7 @@ public class Blockley {
 
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || !index.exists()) {
-                Minecraft.getMinecraft().player.sendMessage(new TextComponentString("Exporting block list (this may take a while)..."));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Exporting block list (this may take a while)..."));
                 createTask();
             } else {
                 show();
@@ -97,12 +95,12 @@ public class Blockley {
 
         for (Block block : Block.REGISTRY) {
             Item item = Item.getItemFromBlock(block);
-            if (item == Items.AIR) {
+            if (item == null) {
                 continue;
             }
 
-            NonNullList<ItemStack> items = NonNullList.create();
-            block.getSubBlocks(CreativeTabs.SEARCH, items);
+            List<ItemStack> items = new LinkedList<>();
+            block.getSubBlocks(item, CreativeTabs.SEARCH, items);
             for (ItemStack stack : items) {
                 IBlockState state = block.getStateFromMeta(stack.getMetadata());
                 BlockInfo info = new BlockInfo(stack, state);
