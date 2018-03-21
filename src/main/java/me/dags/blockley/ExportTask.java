@@ -1,14 +1,12 @@
 package me.dags.blockley;
 
-import me.dags.blockley.template.Context;
-import me.dags.blockley.template.Template;
+import com.google.gson.stream.JsonWriter;
 import net.minecraft.client.gui.ScaledResolution;
+import org.apache.commons.io.IOUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
+import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -36,14 +34,14 @@ public class ExportTask {
     private final LinkedList<BlockInfo> queue;
     private final ScaledResolution resolution;
     private final File images;
-    private final File index;
+    private final File baseDir;
     private final ExecutorService executor;
     private final List<Future> tasks = new LinkedList<>();
 
     private boolean indexExported = false;
 
     private ExportTask() {
-        this.index = null;
+        baseDir = null;
         blocks = null;
         queue = null;
         resolution = null;
@@ -51,12 +49,12 @@ public class ExportTask {
         executor = null;
     }
 
-    public ExportTask(List<BlockInfo> blocks, ScaledResolution resolution, File index, File images) {
+    public ExportTask(List<BlockInfo> blocks, ScaledResolution resolution, File baseDir) {
         this.blocks = blocks;
-        this.queue = new LinkedList<>(blocks);
+        this.baseDir = baseDir;
         this.resolution = resolution;
-        this.images = images;
-        this.index = index;
+        this.queue = new LinkedList<>(blocks);
+        this.images = new File(baseDir, "images");
         this.executor = Executors.newCachedThreadPool();
     }
 
@@ -68,7 +66,7 @@ public class ExportTask {
         if (!queue.isEmpty()) {
             drainQueue();
         } else if (!indexExported) {
-            exportIndex();
+            exportData();
             indexExported = true;
         } else {
             tasks.removeIf(future -> future.isDone() || future.isCancelled());
@@ -99,29 +97,41 @@ public class ExportTask {
         }
     }
 
-    private void exportIndex() {
-        try (FileWriter writer = new FileWriter(Utils.ensure(index))) {
-            try (InputStream inputStream = Blockley.class.getResourceAsStream("/template.html")) {
-                Context context = getContext(blocks);
-                Template template = Template.compile("template", inputStream);
-                template.render(context, writer);
-                writer.flush();
+    private void exportData() {
+        copyResource(new File(baseDir, "index.html"));
+        copyResource(new File(baseDir, "style/style.css"));
+        copyResource(new File(baseDir, "script/page.js"));
+
+        File data = new File(baseDir, "script/data.js");
+        try (FileWriter writer = new FileWriter(Utils.ensure(data))) {
+            StringWriter stringWriter = new StringWriter();
+            try (JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+                jsonWriter.beginArray();
+                for (BlockInfo info : blocks) {
+                    jsonWriter.beginObject();
+                    jsonWriter.name("name").value(info.name);
+                    jsonWriter.name("id").value(info.id + ":" + info.meta);
+                    jsonWriter.name("state").value(info.state);
+                    jsonWriter.name("identifier").value(info.identifier);
+                    jsonWriter.endObject();
+                }
+                jsonWriter.endArray();
             }
-        } catch (Throwable e) {
+            writer.write("const data = `");
+            writer.write(stringWriter.toString());
+            writer.write("`;");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static Context getContext(List<BlockInfo> list) {
-        Context context = Context.root().list("content");
-        for (BlockInfo info : list) {
-            context.map(info.identifier)
-                    .put("name", info.name)
-                    .put("identifier", info.identifier)
-                    .put("state", info.state)
-                    .put("id", info.id)
-                    .put("meta", info.meta);
+    private static void copyResource(File file) {
+        try (InputStream inputStream = Blockley.class.getResourceAsStream("/" + file.getName())) {
+            try (FileWriter writer = new FileWriter(Utils.ensure(file))) {
+                IOUtils.copy(inputStream, writer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return context.getRoot();
     }
 }

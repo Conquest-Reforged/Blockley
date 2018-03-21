@@ -38,14 +38,13 @@ public class Blockley {
     private static final AtomicReference<ExportTask> exportTask = new AtomicReference<>(ExportTask.EMPTY);
 
     private File index = new File("");
-    private File images = new File("");
+    private File baseDir = new File("");
 
     @Mod.EventHandler
     public void init(FMLPreInitializationEvent event) {
         File root = event.getModConfigurationDirectory();
-        File data = new File(root, "blockley");
-        index = new File(data, "index.html");
-        images = new File(data, "images");
+        baseDir = new File(root, "blockley");
+        index = new File(baseDir, "index.html");
         MinecraftForge.EVENT_BUS.register(this);
         ClientRegistry.registerKeyBinding(show);
     }
@@ -88,7 +87,7 @@ public class Blockley {
     private void createTask() {
         List<BlockInfo> items = getAllItems();
         ScaledResolution resolution = new ScaledResolution(Minecraft.getMinecraft());
-        ExportTask task = new ExportTask(items, resolution, index, images);
+        ExportTask task = new ExportTask(items, resolution, baseDir);
         exportTask.set(task);
     }
 

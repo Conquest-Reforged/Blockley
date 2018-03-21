@@ -57,7 +57,7 @@ public class BlockInfo {
     }
 
     private static String safeId(Object in) {
-        String id = in.toString().replaceAll("[^A-Za-z0-9=]", "_");
+        String id = in.toString().replaceAll("[^A-Za-z0-9]", "_");
         return id.endsWith("_") ? id.substring(0, id.length() - 1) : id;
     }
 }
