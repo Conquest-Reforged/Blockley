@@ -1,5 +1,4 @@
 const rateLimitMS = 400;
-const allRows = JSON.parse(data);
 
 var index = 0;
 var pageCount = 1;
@@ -53,7 +52,7 @@ function setSearchTerm(text) {
 
 function updatePage() {
   lock = true;
-  var rows = allRows.filter(searchFilter);
+  var rows = data.filter(searchFilter);
   pageCount = calcPageCount(rows.length);
   var start = index * rowsPerPage;
   var end = start + rowsPerPage;

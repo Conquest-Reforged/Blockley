@@ -53,7 +53,7 @@ public class Blockley {
 
         if (task != ExportTask.EMPTY) {
             if (task.isDone()) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Export complete!"));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Finished generating block list!"));
                 exportTask.set(ExportTask.EMPTY);
                 return;
             }
@@ -64,7 +64,7 @@ public class Blockley {
 
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || !index.exists()) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Exporting block list (this may take a while)..."));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block list. This may take a little while and lower your fps temporarily."));
                 createTask();
             } else {
                 show();

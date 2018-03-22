@@ -106,6 +106,7 @@ public class ExportTask {
         try (FileWriter writer = new FileWriter(Utils.ensure(data))) {
             StringWriter stringWriter = new StringWriter();
             try (JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+                jsonWriter.setHtmlSafe(true);
                 jsonWriter.beginArray();
                 for (BlockInfo info : blocks) {
                     jsonWriter.beginObject();
@@ -117,9 +118,9 @@ public class ExportTask {
                 }
                 jsonWriter.endArray();
             }
-            writer.write("const data = `");
+            writer.write("const data = ");
             writer.write(stringWriter.toString());
-            writer.write("`;");
+            writer.write(";");
         } catch (IOException e) {
             e.printStackTrace();
         }
