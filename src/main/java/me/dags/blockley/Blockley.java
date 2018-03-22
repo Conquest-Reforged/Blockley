@@ -64,7 +64,7 @@ public class Blockley {
 
         if (Minecraft.getMinecraft().inGameHasFocus && show.isPressed()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || !index.exists()) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block list. This may take a little while and lower your fps temporarily."));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentString("Generating block list (this may take a while and lower your fps temporarily)..."));
                 createTask();
             } else {
                 show();
