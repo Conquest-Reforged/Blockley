@@ -1,21 +1,27 @@
 <html>
 <head>
-    <script src="./script/data.js"></script>
-    <script src="./script/page.js"></script>
-    <link rel="stylesheet" href="./style/style.css">
+  <script src="./script/data.js"></script>
+  <script src="./script/page.js"></script>
+  <link rel="stylesheet" href="./style/style.css">
 </head>
 <body>
 <div class="title-bar">
-    <div class="title-wrapper">
-        <div class="search-wrapper">
-            <input class="search" type="text" onkeyup="keyType(this)" placeholder="Search for blocks...">
-        </div>
-        <div class="controls-wrapper">
-            <input type="button" name="previous" value="<" onclick="previous(this)">
-            <label id="page-label"></label>
-            <input type="button" name="next" value=">" onclick="next(this)">
-        </div>
+  <div class="title-wrapper">
+    <div class="search-wrapper">
+      <input class="search" type="text" onkeyup="keyType(this)" placeholder="Search for blocks...">
     </div>
+    <div class="controls-wrapper">
+      <div class="row-control">
+        <label>Rows:</label>
+        <input id="rows-input" type="number" min="5" max="100" onchange="rows(this)">
+      </div>
+      <div class="page-control">
+        <input type="button" name="previous" value="<" onclick="previous(this)">
+        <label id="page-label"></label>
+        <input type="button" name="next" value=">" onclick="next(this)">
+      </div>
+    </div>
+  </div>
 </div>
 <div class="content">
   <table>
@@ -30,6 +36,9 @@
     <tbody id="contents">
     </tbody>
   </table>
+  <div class="table-controls">
+    <input type="button" class="table-button" value="Previous Page" onclick="previous(this)"><input type="button" class="table-button" value="Next Page" onclick="next(this)">
+  </div>
 </div>
 <footer>
   <a href="https://github.com/dags-/Blockley" target="_blank">
@@ -44,7 +53,4 @@
   </a>
 </footer>
 </body>
-<script>
-  updatePage();
-</script>
 </html>
