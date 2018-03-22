@@ -28,7 +28,7 @@ public class ExportTask {
         }
     };
 
-    private static final int PER_TICK = 5;
+    private static final int PER_TICK = 3;
 
     private final List<BlockInfo> blocks;
     private final LinkedList<BlockInfo> queue;

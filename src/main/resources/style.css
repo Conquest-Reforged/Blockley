@@ -1,10 +1,14 @@
 :root {
     --accent: #f44336;
     --icon-size: 52px;
+    --width: 90%;
+    --max-width: 100%;
 }
 
 body {
     font-family: sans-serif;
+    font-size: large;
+    font-style: normal;
     padding: 0;
     margin: 0;
     color: #505050;
@@ -23,7 +27,8 @@ body {
 
 .title-wrapper {
   display: flex;
-  width: 90%;
+  width: var(--width);
+  max-width: var(--max-width);
   margin: auto;
 }
 
@@ -47,17 +52,32 @@ body {
 }
 
 .controls-wrapper {
-  width: 200px;
   padding: 10px 0px 10px 10px;
   white-space: nowrap;
   background-color: #ffffff;
   text-align: center;
 }
 
+.row-control, .page-control {
+  display: inline-block;
+}
+
 .content {
-  width: 90%;
-  margin: 65px auto 20px auto;
+  width: var(--width);
+  max-width: var(--max-width);
+  margin: 80px auto 20px auto;
   box-shadow: 0 0 11px 0px rgba(0, 0, 0, 0.25);
+}
+
+input {
+  font-size: large !important;
+  font-style: normal;
+  padding: 10px;
+  border: none;
+}
+
+input[type=number] {
+  width: 70px;
 }
 
 input[type=button] {
@@ -67,19 +87,30 @@ input[type=button] {
   padding: 10px 20px;
 }
 
-input[type=button]:hover {
+input:hover {
   filter: brightness(105%) !important;
   box-shadow: 0 0 3px 0px rgba(0, 0, 0, 0.4);
 }
 
-input[type=button]:active {
+input:active {
   filter: brightness(98%) !important;
+}
+
+.table-button {
+  width: 50%;
+  padding: 20px !important;
+  color: #bbbbbb !important;
+  background-color: #ffffff !important;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
+}
+
+thead {
+  background-color: var(--accent);
 }
 
 th {
@@ -128,9 +159,20 @@ footer {
     padding: 20px;
     text-align: center;
 }
+
 footer a {
     text-decoration: none !important;
 }
+
 footer:hover {
     opacity: 0.7;
+}
+
+@media all and (max-width: 800px) {
+  .row-control {
+    display: none;
+  }
+  .content, .title-wrapper {
+    width: 100%;
+  }
 }

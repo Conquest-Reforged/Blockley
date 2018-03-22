@@ -1,11 +1,18 @@
 const rateLimitMS = 400;
-const rowsPerPage = 15;
 const allRows = JSON.parse(data);
 
 var index = 0;
 var pageCount = 1;
+var rowsPerPage = 25;
 var lock = false;
 var searchFilter = (el, i) => true;
+
+window.addEventListener("load", () => {
+  console.log("initializing");
+  var rowScroller = document.getElementById("rows-input");
+  rowScroller.value = rowsPerPage;
+  updatePage();
+});
 
 function previous(btn) {
   if (index > 0) {
@@ -19,6 +26,12 @@ function next(btn) {
     index++;
     updatePage();
   }
+}
+
+function rows(input) {
+  var contents = document.getElementById("contents");
+  rowsPerPage = parseInt(input.value);
+  updatePage();
 }
 
 function keyType(input) {
@@ -44,7 +57,7 @@ function updatePage() {
   pageCount = calcPageCount(rows.length);
   var start = index * rowsPerPage;
   var end = start + rowsPerPage;
-  setRows(rows.slice(start, end));
+  setContent(rows.slice(start, end));
   var page = document.getElementById("page-label");
   var pageNumber = index + 1;
   page.innerText = `Page: ${pageNumber} / ${pageCount}`;
@@ -60,23 +73,17 @@ function calcPageCount(rows) {
     return 1 + round;
 }
 
-function setRows(rows) {
+function setContent(rows) {
   var contents = document.getElementById("contents");
-  console.log(contents);
-  removeAll(contents);
+  var body = document.createElement("tbody");
+  body.id = "contents";
+
   rows.forEach(e => {
     var row = createRow(e);
-    contents.appendChild(row);
+    body.appendChild(row);
   });
-}
 
-function removeAll(div) {
-  if (div === null) {
-    return;
-  }
-  while (div.firstChild) {
-    div.removeChild(div.firstChild);
-  }
+  contents.parentNode.replaceChild(body, contents);
 }
 
 function match(value, match) {
